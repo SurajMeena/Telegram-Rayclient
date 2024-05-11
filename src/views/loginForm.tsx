@@ -11,7 +11,7 @@ export default function LoginForm() {
   const [phoneCode, setPhoneCode] = useState("");
   const [isCodeSent, setIsCodeSent] = useState(false);
   const { api_id, api_hash } = getPreferenceValues<preferences>();
-
+  // TODO: handle errors carefully
   useEffect(() => {
     (async () => {
       client = await returnClient();

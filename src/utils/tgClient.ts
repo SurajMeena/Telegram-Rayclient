@@ -9,6 +9,7 @@ export interface preferences {
 
 let SESSION: StringSession;
 
+// TODO: check how can we close the client connection
 const { api_id, api_hash } = getPreferenceValues<preferences>();
 export const returnClient = async () => {
   const session = await LocalStorage.getItem<string>("session");
