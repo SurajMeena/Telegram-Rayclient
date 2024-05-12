@@ -12,8 +12,12 @@ let SESSION: StringSession;
 // TODO: check how can we close the client connection
 const { api_id, api_hash } = getPreferenceValues<preferences>();
 export const returnClient = async () => {
-  const session = await LocalStorage.getItem<string>("session");
-  SESSION = new StringSession(session ? JSON.parse(session) : "");
+  const session = await getSession();
+  SESSION = new StringSession(session);
   return new TelegramClient(SESSION, parseInt(api_id), api_hash, { connectionRetries: 5 });
 };
 
+export async function getSession() {
+  const session = await LocalStorage.getItem<string>("session");
+  return session ? JSON.parse(session) : "";
+}
