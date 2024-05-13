@@ -14,6 +14,7 @@ const { api_id, api_hash } = getPreferenceValues<preferences>();
 export const returnClient = async () => {
   const session = await getSession();
   SESSION = new StringSession(session);
+  console.log("creating a new client...");
   return new TelegramClient(SESSION, parseInt(api_id), api_hash, { connectionRetries: 5 });
 };
 
