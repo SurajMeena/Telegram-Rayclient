@@ -1,24 +1,25 @@
 import { TelegramClient } from "telegram";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Action, ActionPanel, Form, getPreferenceValues, LocalStorage } from "@raycast/api";
 import { preferences, returnClient } from "../utils/tgClient";
+import { ClientContext } from "../contexts/clientContext";
 
 let loginClient: TelegramClient;
 
-export default function LoginForm(props: { setGlobalClient: (client: TelegramClient) => void }) {
+export default function LoginForm() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [phoneCode, setPhoneCode] = useState("");
   const [isCodeSent, setIsCodeSent] = useState(false);
   const { api_id, api_hash } = getPreferenceValues<preferences>();
   const [isLoading, setIsLoading] = useState(true);
-
+  const {setGlobalClient} = useContext(ClientContext);
   // TODO: handle errors carefully
   useEffect(() => {
     (async () => {
       console.log("requested client from login form");
       loginClient = await returnClient();
-      props.setGlobalClient(loginClient);
+      setGlobalClient(loginClient);
       setIsLoading(false);
     })();
   }, []);

@@ -14,7 +14,7 @@ interface quickMsgArguments {
 
 function App(props: quickMsgArguments) {
   const { session } = useContext(SessionContext);
-  const { globalClient, setGlobalClient } = useContext(ClientContext);
+  const { globalClient } = useContext(ClientContext);
   console.log("global client: ", globalClient);
   useEffect(() => {
     (async () => {
@@ -35,7 +35,7 @@ function App(props: quickMsgArguments) {
   return (globalClient != undefined && session) != "" ? (
     <Detail markdown={`Last Message Sent: ${props.message} to user ${props.contact}`} />
   ) : (
-    <LoginForm setGlobalClient={setGlobalClient} />
+    <LoginForm />
   );
 }
 export default function QuickMsg(props: LaunchProps<{ arguments: quickMsgArguments }>) {
