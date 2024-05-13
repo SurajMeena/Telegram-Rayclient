@@ -1,6 +1,6 @@
 import { Detail, LaunchProps } from "@raycast/api";
 import { useContext, useEffect, useState } from "react";
-import { getSession, returnClient } from "./utils/tgClient";
+import { getSession } from "./utils/tgClient";
 import { TelegramClient } from "telegram";
 import LoginForm from "./views/loginForm";
 import { SessionContext } from "./contexts/sessionContext";
@@ -10,17 +10,15 @@ interface quickMsgArguments {
   contact: string;
   message: string;
 }
-// let client: TelegramClient;
 
 function App(props: quickMsgArguments) {
   const { session } = useContext(SessionContext);
   const { globalClient } = useContext(ClientContext);
-  console.log("global client: ", globalClient);
   useEffect(() => {
     (async () => {
-      // client = await returnClient();
-      if(globalClient === undefined) {
-        console.log("Client is undefined")
+      console.log("Connecting client after fetching a new one");
+      if (globalClient === undefined) {
+        console.log("Client is undefined");
         return;
       }
       await globalClient.connect();
@@ -30,6 +28,10 @@ function App(props: quickMsgArguments) {
         console.log("Error sending message: ", e);
       }
     })();
+    return () => {
+      console.log("Disconnecting client");
+      globalClient?.disconnect();
+    };
   }, [globalClient]);
 
   return (globalClient != undefined && session) != "" ? (
