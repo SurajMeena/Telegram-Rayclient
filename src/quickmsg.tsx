@@ -1,19 +1,26 @@
 import { Detail, LaunchProps } from "@raycast/api";
 import { useContext, useEffect, useState } from "react";
 import { getSession } from "./utils/tgClient";
-import { TelegramClient } from "telegram";
+import { Api, TelegramClient } from "telegram";
 import LoginForm from "./views/loginForm";
 import { SessionContext } from "./contexts/sessionContext";
 import { ClientContext } from "./contexts/clientContext";
+import util from "util";
 
 interface quickMsgArguments {
   contact: string;
   message: string;
 }
-
+interface Contact {
+  username: string;
+  firstName?: string;
+  lastName?: string;
+}
 function App(props: quickMsgArguments) {
   const { session } = useContext(SessionContext);
   const { globalClient } = useContext(ClientContext);
+  const [sentTo, setSentTo] = useState<Contact>({ username: "me" });
+
   useEffect(() => {
     (async () => {
       console.log("Connecting client after fetching a new one");
@@ -23,7 +30,26 @@ function App(props: quickMsgArguments) {
       }
       await globalClient.connect();
       try {
-        await globalClient.sendMessage("me", { message: props.message });
+        const result: Api.contacts.Found = await globalClient.invoke(
+          new Api.contacts.Search({
+            q: props.contact,
+            limit: 3,
+          })
+        );
+        const users: Api.User[] = (result.users as Api.User[]).filter(
+          (user) => user.bot === false && user.contact == true && user.username != null
+        );
+        // console.log(
+        //   util.inspect(users, {
+        //     showHidden: false,
+        //     depth: null,
+        //   })
+        // );
+        const username = users[0].username;
+        if (username) {
+          await globalClient.sendMessage(username, { message: props.message });
+          setSentTo({ username: username, firstName: users[0].firstName, lastName: users[0].lastName });
+        }
       } catch (e) {
         console.log("Error sending message: ", e);
       }
@@ -35,7 +61,11 @@ function App(props: quickMsgArguments) {
   }, [globalClient]);
 
   return (globalClient != undefined && session) != "" ? (
-    <Detail markdown={`Last Message Sent: ${props.message} to user ${props.contact}`} />
+    <Detail
+      markdown={`Sent: *${props.message}* to **${sentTo.firstName || ""} ${sentTo.lastName || ""}(${
+        sentTo.username
+      })**`}
+    />
   ) : (
     <LoginForm />
   );
