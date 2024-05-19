@@ -19,7 +19,7 @@ interface Contact {
 function App(props: quickMsgArguments) {
   const { session } = useContext(SessionContext);
   const { globalClient } = useContext(ClientContext);
-  const [sentTo, setSentTo] = useState<Contact>({ username: "me" });
+  const [sentTo, setSentTo] = useState<Contact | undefined>(undefined);
 
   useEffect(() => {
     (async () => {
@@ -45,6 +45,9 @@ function App(props: quickMsgArguments) {
         //     depth: null,
         //   })
         // );
+        if(users.length === 0) {
+          return
+        }
         const username = users[0].username;
         if (username) {
           await globalClient.sendMessage(username, { message: props.message });
@@ -60,14 +63,14 @@ function App(props: quickMsgArguments) {
     };
   }, [globalClient]);
 
-  return (globalClient != undefined && session) != "" ? (
-    <Detail
-      markdown={`Sent: *${props.message}* to **${sentTo.firstName || ""} ${sentTo.lastName || ""}(${
-        sentTo.username
-      })**`}
-    />
-  ) : (
+  return globalClient === undefined || session == "" ? (
     <LoginForm />
+  ) : (
+    <Detail
+      markdown={sentTo ? `Sent: *${props.message}* to **${sentTo?.firstName || ""} ${sentTo?.lastName || ""}(${
+        sentTo?.username
+      })**` : `Couldn't find any user in your contact list with **${props.contact}** name`}
+    />
   );
 }
 export default function QuickMsg(props: LaunchProps<{ arguments: quickMsgArguments }>) {
