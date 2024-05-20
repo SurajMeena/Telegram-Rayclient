@@ -71,9 +71,7 @@ function App(props: quickMsgArguments) {
     <Detail
       markdown={
         sentTo
-          ? `Sent: *${props.message}* to **${sentTo?.firstName || ""} ${sentTo?.lastName || ""}(${
-              sentTo?.username
-            })**`
+          ? `Sent: *${props.message}* to **${sentTo?.firstName || ""} ${sentTo?.lastName || ""}(${sentTo?.username})**`
           : `Couldn't find any user in your contact list with **${props.contact}** name`
       }
     />

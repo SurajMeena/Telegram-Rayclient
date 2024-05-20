@@ -1,18 +1,19 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "telegram",
-  "title": "Telegram",
-  "description": "This api helps you send quick messages to your telegram contacts",
-  "icon": "command-icon.png",
+  "title": "Telegram Rayclient",
+  "description": "Send quick messages to your telegram contacts from raycast",
+  "icon": "telegram.png",
   "author": "psychic_dev",
   "categories": [
-    "Applications"
+    "Communication",
+    "Productivity"
   ],
   "license": "MIT",
   "commands": [
     {
       "name": "quickmsg",
-      "title": "quick msg",
+      "title": "Quick Message",
       "description": "send quick messages to your telegram contacts",
       "arguments": [
         {
