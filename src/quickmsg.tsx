@@ -23,11 +23,11 @@ function App(props: quickMsgArguments) {
 
   useEffect(() => {
     (async () => {
-      console.log("Connecting client after fetching a new one");
       if (globalClient === undefined) {
         console.log("Client is undefined");
         return;
       }
+      console.log("Connecting client after fetching a new one");
       await globalClient.connect();
       try {
         const result: Api.contacts.Found = await globalClient.invoke(
@@ -45,8 +45,8 @@ function App(props: quickMsgArguments) {
         //     depth: null,
         //   })
         // );
-        if(users.length === 0) {
-          return
+        if (users.length === 0) {
+          return;
         }
         const username = users[0].username;
         if (username) {
@@ -58,19 +58,25 @@ function App(props: quickMsgArguments) {
       }
     })();
     return () => {
-      console.log("Disconnecting client");
+      if (globalClient) {
+        console.log("Disconnecting client if it exists");
+      }
       globalClient?.disconnect();
     };
   }, [globalClient]);
 
   return globalClient === undefined || session == "" ? (
     <LoginForm />
-  ) : (
+  ) : sentTo ? (
     <Detail
-      markdown={sentTo ? `Sent: *${props.message}* to **${sentTo?.firstName || ""} ${sentTo?.lastName || ""}(${
-        sentTo?.username
-      })**` : `Couldn't find any user in your contact list with **${props.contact}** name`}
+      markdown={
+        sentTo
+          ? `Sent: *${props.message}* to **${sentTo?.firstName || ""} ${sentTo?.lastName || ""}(${sentTo?.username})**`
+          : `Couldn't find any user in your contact list with **${props.contact}** name`
+      }
     />
+  ) : (
+    <Detail isLoading />
   );
 }
 export default function QuickMsg(props: LaunchProps<{ arguments: quickMsgArguments }>) {
@@ -79,9 +85,15 @@ export default function QuickMsg(props: LaunchProps<{ arguments: quickMsgArgumen
   const [isLoading, setIsLoading] = useState<boolean>(true);
   useEffect(() => {
     (async () => {
-      const sessionValue = await getSession();
-      setSession(sessionValue);
-      setIsLoading(false);
+      try {
+        const sessionValue = await getSession();
+        setSession(sessionValue);
+      } catch (error) {
+        console.error("Error getting session: ", error);
+        // You can set an error state here to show the error message on the UI
+      } finally {
+        setIsLoading(false);
+      }
     })();
   }, []);
 

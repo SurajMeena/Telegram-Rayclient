@@ -1,6 +1,6 @@
 import { TelegramClient } from "telegram";
 import { useContext, useEffect, useState } from "react";
-import { Action, ActionPanel, Form, getPreferenceValues, LocalStorage } from "@raycast/api";
+import { Action, ActionPanel, Detail, Form, getPreferenceValues, LocalStorage } from "@raycast/api";
 import { preferences, returnClient } from "../utils/tgClient";
 import { ClientContext } from "../contexts/clientContext";
 
@@ -13,14 +13,21 @@ export default function LoginForm() {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const { api_id, api_hash } = getPreferenceValues<preferences>();
   const [isLoading, setIsLoading] = useState(true);
-  const {setGlobalClient} = useContext(ClientContext);
-  // TODO: handle errors carefully
+  const { setGlobalClient } = useContext(ClientContext);
+  const [loggedIn, setLoggedIn] = useState(false);
+
   useEffect(() => {
     (async () => {
-      console.log("requested client from login form");
-      loginClient = await returnClient();
-      setGlobalClient(loginClient);
-      setIsLoading(false);
+      try {
+        console.log("requested client from login form");
+        loginClient = await returnClient();
+        setGlobalClient(loginClient);
+      } catch (error) {
+        console.error("Error requesting client from login form: ", error);
+        // You can set an error state here to show the error message on the UI
+      } finally {
+        setIsLoading(false);
+      }
     })();
   }, []);
 
@@ -29,28 +36,42 @@ export default function LoginForm() {
   }
 
   async function sendCodeHandler(): Promise<void> {
-    await loginClient.connect();
-    await loginClient.sendCode(
-      {
-        apiId: parseInt(api_id),
-        apiHash: api_hash,
-      },
-      phoneNumber
-    );
-    setIsCodeSent(true);
+    setIsLoading(true);
+    try {
+      await loginClient.connect();
+      await loginClient.sendCode(
+        {
+          apiId: parseInt(api_id),
+          apiHash: api_hash,
+        },
+        phoneNumber
+      );
+      setIsCodeSent(true);
+    } catch (error) {
+      console.error("Error sending code: ", error);
+      // You can set an error state here to show the error message on the UI
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   async function clientStartHandler(): Promise<void> {
-    await loginClient.start({
-      phoneNumber,
-      password: userAuthParamCallback(password),
-      phoneCode: userAuthParamCallback(phoneCode),
-      onError: (err) => {
-        console.log(err);
-      },
-    });
-    await LocalStorage.setItem("session", JSON.stringify(loginClient.session.save()));
-    await loginClient.sendMessage("me", { message: "You're successfully logged in!" });
+    try {
+      await loginClient.start({
+        phoneNumber,
+        password: userAuthParamCallback(password),
+        phoneCode: userAuthParamCallback(phoneCode),
+        onError: (err) => {
+          console.log(err);
+        },
+      });
+      await LocalStorage.setItem("session", JSON.stringify(loginClient.session.save()));
+      await loginClient.sendMessage("me", { message: "You're successfully logged in!" });
+      setLoggedIn(true);
+    } catch (error) {
+      console.error("Error starting client: ", error);
+      // You can set an error state here to show the error message on the UI
+    }
   }
 
   function userAuthParamCallback<T>(param: T): () => Promise<T> {
@@ -60,10 +81,11 @@ export default function LoginForm() {
       });
     };
   }
-
   return (
     <>
-      {!isCodeSent ? (
+      {loggedIn ? (
+        <Detail markdown={`You're successfully logged in!`} />
+      ) : !isCodeSent ? (
         <Form
           actions={
             <ActionPanel>

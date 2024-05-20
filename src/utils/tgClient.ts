@@ -9,16 +9,26 @@ export interface preferences {
 
 let SESSION: StringSession;
 
-// TODO: check how can we close the client connection
+// TODO: Add a client disconnect function
 const { api_id, api_hash } = getPreferenceValues<preferences>();
 export const returnClient = async () => {
-  const session = await getSession();
-  SESSION = new StringSession(session);
-  console.log("creating a new client...");
-  return new TelegramClient(SESSION, parseInt(api_id), api_hash, { connectionRetries: 5 });
+  try {
+    const session = await getSession();
+    SESSION = new StringSession(session);
+    console.log("creating a new client...");
+    return new TelegramClient(SESSION, parseInt(api_id), api_hash, { connectionRetries: 5 });
+  } catch (error) {
+    console.error("Error creating a new client: ", error);
+    throw error;
+  }
 };
 
 export async function getSession() {
-  const session = await LocalStorage.getItem<string>("session");
-  return session ? JSON.parse(session) : "";
+  try {
+    const session = await LocalStorage.getItem<string>("session");
+    return session ? JSON.parse(session) : "";
+  } catch (error) {
+    console.error("Error getting session: ", error);
+    throw error;
+  }
 }
