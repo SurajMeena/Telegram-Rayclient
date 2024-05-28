@@ -1,9 +1,19 @@
-# Telegram
+# Telegram RayClient
 
-This api helps you send quick messages to your telegram contacts
+The Telegram RayClient API allows you to send quick messages to your Telegram contacts.
 
-To utilize this Telegram RayClient, users are required to input their API ID and API hash in the preferences pane
+## Setup
 
-Upon executing the 'Quick Message' command for the first time, the application will prompt you to enter your phone number. Subsequently, an authentication code will be sent to your telegram app
+To use this API, you need to provide your API ID and API hash. These can be set in the preferences pane.
 
-This authentication process generates a session key, which is then reused for all subsequent authentications and message transmissions to your contacts.
+### Obtaining API ID and Hash
+
+1. Visit the [Telegram API website](https://my.telegram.org/auth).
+2. Log in and create a new application.
+3. Copy the provided API ID and hash.
+
+## Usage
+
+When you run the 'Quick Message' command for the first time, the application will ask for your phone number. This is necessary because the Telegram userbot APIs, which are used to send messages, require explicit access. This access is granted by logging in. An authentication code will then be sent to your Telegram app.
+
+This authentication process creates a session key. This key is used for all future authentications and message transmissions to your contacts.
