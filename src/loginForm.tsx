@@ -1,8 +1,8 @@
 import { TelegramClient } from "telegram";
 import { useContext, useEffect, useState } from "react";
 import { Action, ActionPanel, Detail, Form, getPreferenceValues, LocalStorage, PreferenceValues } from "@raycast/api";
-import { returnClient } from "../utils/tgClient";
-import { ClientContext } from "../contexts/clientContext";
+import { returnClient } from "./utils/tgClient";
+import { ClientContext } from "./contexts/clientContext";
 
 let loginClient: TelegramClient;
 

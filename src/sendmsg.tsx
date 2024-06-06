@@ -2,7 +2,7 @@ import { Detail, LaunchProps } from "@raycast/api";
 import { useContext, useEffect, useState } from "react";
 import { getSession } from "./utils/tgClient";
 import { Api, TelegramClient } from "telegram";
-import LoginForm from "./views/loginForm";
+import LoginForm from "./loginForm";
 import { SessionContext } from "./contexts/sessionContext";
 import { ClientContext } from "./contexts/clientContext";
 import util from "util";
@@ -80,7 +80,7 @@ function App(props: quickMsgArguments) {
     <Detail isLoading />
   );
 }
-export default function QuickMsg(props: LaunchProps<{ arguments: quickMsgArguments }>) {
+export default function SendMsg(props: LaunchProps<{ arguments: quickMsgArguments }>) {
   const [session, setSession] = useState<string>("");
   const [globalClient, setGlobalClient] = useState<TelegramClient | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(true);
