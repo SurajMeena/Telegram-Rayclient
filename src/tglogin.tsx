@@ -1,10 +1,24 @@
 import { TelegramClient } from "telegram";
 import { useContext, useEffect, useState } from "react";
-import { Action, ActionPanel, Detail, Form, getPreferenceValues, LocalStorage, PreferenceValues } from "@raycast/api";
-import { returnClient } from "./utils/tgClient";
+import {
+  Action,
+  ActionPanel,
+  Detail,
+  Form,
+  getPreferenceValues,
+  LocalStorage,
+  PreferenceValues,
+  useNavigation,
+} from "@raycast/api";
+import { getSession, returnClient } from "./utils/tgClient";
 import { ClientContext } from "./contexts/clientContext";
+import { setTimeout } from "timers/promises";
 
 let loginClient: TelegramClient;
+let sessionKey: string;
+(async () => {
+  sessionKey = await getSession();
+})();
 
 export default function LoginForm() {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -14,7 +28,8 @@ export default function LoginForm() {
   const { api_id, api_hash } = getPreferenceValues<PreferenceValues>();
   const [isLoading, setIsLoading] = useState(true);
   const { setGlobalClient } = useContext(ClientContext);
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(api_id && api_hash && sessionKey);
+  const { pop } = useNavigation();
 
   useEffect(() => {
     (async () => {
@@ -66,7 +81,9 @@ export default function LoginForm() {
         },
       });
       await LocalStorage.setItem("session", JSON.stringify(loginClient.session.save()));
-      await loginClient.sendMessage("me", { message: "You're successfully logged in!" });
+      await loginClient.sendMessage("me", { message: "You're successfully logged in! Taking you back to homepage" });
+      await setTimeout(3000);
+      pop();
       setLoggedIn(true);
     } catch (error) {
       console.error("Error starting client: ", error);

@@ -1,6 +1,6 @@
 import { Api, TelegramClient } from "telegram";
-import { returnClient } from "./utils/tgClient";
-import { LaunchProps, Toast, showHUD, showToast } from "@raycast/api";
+import { getSession, returnClient } from "./utils/tgClient";
+import { LaunchProps, LaunchType, Toast, launchCommand, showHUD, showToast } from "@raycast/api";
 import { setTimeout } from "timers/promises";
 
 interface messageArgs {
@@ -8,6 +8,11 @@ interface messageArgs {
   message: string;
 }
 export default async function quickmsg(props: LaunchProps<{ arguments: messageArgs }>) {
+  const sessionString = await getSession();
+  if (!sessionString) {
+    await launchCommand({ name: "tglogin", type: LaunchType.UserInitiated });
+    return;
+  }
   const tgClient: TelegramClient | undefined = await returnClient();
   const { contact, message } = props.arguments;
   await tgClient.connect();
